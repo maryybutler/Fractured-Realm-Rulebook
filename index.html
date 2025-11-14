@@ -68,12 +68,10 @@
   }
 
   .btn {
-    background: rgba(43,121,146,0.8);
+    background:none;
     color:white;
     border:none;
-    padding:10px 15px;
-    font-size:1.5rem;
-    border-radius:8px;
+    font-size:2rem;
     cursor:pointer;
     pointer-events:auto;
     user-select:none;
@@ -93,23 +91,22 @@
 
 <script>
 const pages = [
-  "CARD_GAME–Rule_Set-01.png",
-  "CARD_GAME–Rule_Set-02.png",
-  "CARD_GAME–Rule_Set-03.png",
-  "CARD_GAME–Rule_Set-04.png",
-  "CARD_GAME–Rule_Set-05.png",
-  "CARD_GAME–Rule_Set-06.png",
-  "CARD_GAME–Rule_Set-07.png",
-  "CARD_GAME–Rule_Set-08.png",
-  "CARD_GAME–Rule_Set-09.png",
-  "CARD_GAME–Rule_Set-10.png",
-  "CARD_GAME–Rule_Set-11.png",
-  "CARD_GAME–Rule_Set-12.png",
-  "CARD_GAME–Rule_Set-13.png",
-  "CARD_GAME–Rule_Set-14.png",
-  "CARD_GAME–Rule_Set-15.png",
-  "CARD_GAME–Rule_Set-16.png",
-  "CARD_GAME–Rule_Set-17.png",
+  "CARD_GAME-Rule_Set-01.png",
+  "CARD_GAME-Rule_Set-03.png",
+  "CARD_GAME-Rule_Set-04.png",
+  "CARD_GAME-Rule_Set-05.png",
+  "CARD_GAME-Rule_Set-06.png",
+  "CARD_GAME-Rule_Set-07.png",
+  "CARD_GAME-Rule_Set-08.png",
+  "CARD_GAME-Rule_Set-09.png",
+  "CARD_GAME-Rule_Set-10.png",
+  "CARD_GAME-Rule_Set-11.png",
+  "CARD_GAME-Rule_Set-12.png",
+  "CARD_GAME-Rule_Set-13.png",
+  "CARD_GAME-Rule_Set-14.png",
+  "CARD_GAME-Rule_Set-15.png",
+  "CARD_GAME-Rule_Set-16.png",
+  "CARD_GAME-Rule_Set-17.png",
   "fracturedrealmlogo.png"  // last page is logo
 ];
 
@@ -139,7 +136,7 @@ function buildPages(){
     bookEl.appendChild(el);
   });
   pageEls = Array.from(bookEl.querySelectorAll('.page'));
-  pageEls[currentIndex].classList.add('visible'); // show page 1 on load
+  pageEls[currentIndex].classList.add('visible'); // show first page
 }
 
 function nextPage(){
