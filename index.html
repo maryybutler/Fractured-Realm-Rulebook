@@ -1,147 +1,255 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Fractured Realm Rulebook</title>
 
-<!-- PWA manifest -->
 <link rel="manifest" href="/Fractured-Realm-Rulebook/manifest.json">
-
-<!-- iOS install support -->
+<meta name="theme-color" content="#5e5754">
 <link rel="apple-touch-icon" href="/Fractured-Realm-Rulebook/fracturedrealmlogo.png">
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
 <style>
-    body {
-        margin: 0;
-        background: #5e5754;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        height: 100vh;
-    }
+  :root { --bg: #5e5754; }
+  html,body { height:100%; margin:0; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { display:flex; align-items:center; justify-content:center; font-family:Verdana,Arial,sans-serif; }
 
-    #viewer {
-        position: relative;
-        width: 95vw;
-        height: 95vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  /* Container to keep book centered and responsive */
+  #viewer {
+    width: min(920px, 96vw);
+    height: min(920px, 92vh);
+    max-width: 1200px;
+    max-height: 1000px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    box-sizing: border-box;
+  }
 
-    img.page {
-        max-width: 100%;
-        max-height: 100%;
-        border-radius: 6px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.4);
-        transition: transform 0.5s ease;
-    }
+  /* The PageFlip library will mount here */
+  #book {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    touch-action: pan-y;
+  }
 
-    /* 3D flip effect */
-    .flip-next { transform: rotateY(-90deg); }
-    .flip-prev { transform: rotateY(90deg); }
+  /* Controls overlay (white arrows on same bg) */
+  .controls {
+    position:absolute;
+    top:50%;
+    left:0;
+    right:0;
+    transform:translateY(-50%);
+    display:flex;
+    justify-content:space-between;
+    pointer-events:none;
+    padding:0 12px;
+  }
+  .arrow {
+    pointer-events:auto;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2.6rem;
+    padding: 8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .arrow:active { transform: translateY(1px); }
+  .arrow[disabled] { opacity:.35; cursor:not-allowed; }
 
-    /* Navigation arrows */
-    .arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 45px;
-        font-weight: bold;
-        color: white;
-        background: transparent;
-        padding: 10px;
-        cursor: pointer;
-        user-select: none;
-    }
-    #prev { left: 10px; }
-    #next { right: 10px; }
+  /* Small message if library fails */
+  #fallback {
+    color: #eee;
+    text-align:center;
+    padding: 12px;
+  }
+
+  @media (max-width:640px){
+    .arrow { font-size: 2.2rem; }
+    #viewer { width:96vw; height:88vh; }
+  }
 </style>
 </head>
-
 <body>
+  <div id="viewer" aria-live="polite">
+    <div id="book" role="application" aria-label="Fractured Realm Rulebook"></div>
 
-<div id="viewer">
-    <span id="prev" class="arrow">&#10094;</span>
-    <img id="pageImg" class="page" src="">
-    <span id="next" class="arrow">&#10095;</span>
-</div>
+    <div class="controls" aria-hidden="false">
+      <button id="prev" class="arrow" aria-label="Previous page">‹</button>
+      <button id="next" class="arrow" aria-label="Next page">›</button>
+    </div>
 
-<script>
-const base = "/Fractured-Realm-Rulebook/";
+    <div id="fallback" style="display:none">Loading...</div>
+  </div>
 
-const pages = [
-    base + "01.png",
-    base + "02.png",
-    base + "03.png",
-    base + "04.png",
-    base + "05.png",
-    base + "06.png",
-    base + "07.png",
-    base + "08.png",
-    base + "09.png",
-    base + "10.png",
-    base + "11.png",
-    base + "12.png",
-    base + "13.png",
-    base + "14.png",
-    base + "15.png",
-    base + "16.png",
-    base + "17.png",
-    base + "fracturedrealmlogo.png"
-];
+  <!-- PageFlip library (browser build) -->
+  <script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.min.js"></script>
 
-let current = 0;
-const img = document.getElementById("pageImg");
+  <script>
+  (function(){
+    const base = "/Fractured-Realm-Rulebook/";
+    const pages = [
+      base + "01.png",
+      base + "02.png",
+      base + "03.png",
+      base + "04.png",
+      base + "05.png",
+      base + "06.png",
+      base + "07.png",
+      base + "08.png",
+      base + "09.png",
+      base + "10.png",
+      base + "11.png",
+      base + "12.png",
+      base + "13.png",
+      base + "14.png",
+      base + "15.png",
+      base + "16.png",
+      base + "17.png",
+      base + "fracturedrealmlogo.png"
+    ];
 
-function showPage(i, direction) {
-    if (direction) {
-        img.classList.add(direction);
-        setTimeout(() => {
-            img.src = pages[i];
-            img.classList.remove(direction);
-        }, 250);
-    } else {
-        img.src = pages[i];
+    const viewer = document.getElementById('viewer');
+    const bookEl = document.getElementById('book');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const fallback = document.getElementById('fallback');
+
+    // sizing helper: choose a book size that preserves portrait feel
+    function getBookSize(){
+      const vw = Math.max(320, window.innerWidth * 0.82);
+      const vh = Math.max(480, window.innerHeight * 0.78);
+      // keep typical portrait aspect ratio ~ 0.7-0.75 width/height
+      const targetWidth = Math.min(900, vw);
+      const targetHeight = Math.min(1200, vh);
+      return { width: Math.round(targetWidth), height: Math.round(targetHeight) };
     }
-}
 
-document.getElementById("next").onclick = () => {
-    if (current < pages.length - 1) {
-        current++;
-        showPage(current, "flip-next");
+    // Create PageFlip when library is ready
+    function initFlip(){
+      if (!window.PageFlip) {
+        // library didn't load
+        fallback.style.display = 'block';
+        fallback.textContent = "Flipbook library failed to load. Using simple viewer.";
+        // fallback simple viewer:
+        simpleFallbackViewer();
+        return;
+      }
+
+      // Remove fallback if present
+      fallback.style.display = 'none';
+
+      // compute size
+      const sz = getBookSize();
+
+      // Create PageFlip instance
+      const pf = new window.PageFlip(bookEl, {
+        width: sz.width,
+        height: sz.height,
+        size: "fixed",
+        usePortrait: true,
+        maxShadowOpacity: 0.6,
+        showCover: false,
+        mobileScrollSupport: false
+      });
+
+      // Load images
+      pf.loadFromImages(pages)
+        .then(() => {
+          // ready — set controls
+          updateButtons();
+        })
+        .catch(err => {
+          console.error("PageFlip load error:", err);
+          fallback.style.display = 'block';
+          fallback.textContent = "Error loading pages; using fallback viewer.";
+          simpleFallbackViewer();
+        });
+
+      // navigation helpers
+      function updateButtons(){
+        prevBtn.disabled = pf.getCurrentPageIndex() === 0;
+        nextBtn.disabled = pf.getCurrentPageIndex() === pf.getPageCount() - 1;
+      }
+
+      prevBtn.addEventListener('click', ()=> {
+        pf.flipPrev();
+      });
+      nextBtn.addEventListener('click', ()=> {
+        pf.flipNext();
+      });
+
+      // keyboard navigation
+      window.addEventListener('keydown', (e)=>{
+        if(e.key === 'ArrowRight') pf.flipNext();
+        if(e.key === 'ArrowLeft') pf.flipPrev();
+      });
+
+      // update buttons when page changes
+      pf.on('flip', (e) => {
+        updateButtons();
+      });
+
+      // responsive: resize on orientation/resize
+      window.addEventListener('resize', () => {
+        const newSize = getBookSize();
+        try {
+          pf.updateFromHtml(); // best-effort to refresh; some builds provide resize methods
+        } catch(e){}
+      });
     }
-};
 
-document.getElementById("prev").onclick = () => {
-    if (current > 0) {
-        current--;
-        showPage(current, "flip-prev");
+    // Simple fallback viewer (no drag), uses existing next/prev buttons and img element
+    function simpleFallbackViewer(){
+      // create single <img> to show pages
+      bookEl.innerHTML = '';
+      const img = document.createElement('img');
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '100%';
+      img.style.borderRadius = '6px';
+      img.style.boxShadow = '0 0 20px rgba(0,0,0,0.4)';
+      bookEl.appendChild(img);
+
+      let idx = 0;
+      img.src = pages[idx];
+
+      prevBtn.addEventListener('click', ()=> {
+        if(idx > 0) { idx--; img.src = pages[idx]; }
+      });
+      nextBtn.addEventListener('click', ()=> {
+        if(idx < pages.length - 1) { idx++; img.src = pages[idx]; }
+      });
+
+      window.addEventListener('keydown', (e)=>{
+        if(e.key === 'ArrowRight') { if(idx < pages.length - 1) { idx++; img.src = pages[idx]; } }
+        if(e.key === 'ArrowLeft') { if(idx > 0) { idx--; img.src = pages[idx]; } }
+      });
+
+      // basic swipe
+      let sx=0;
+      bookEl.addEventListener('touchstart', (ev)=> sx = ev.touches[0].clientX, {passive:true});
+      bookEl.addEventListener('touchend', (ev)=> {
+        const ex = ev.changedTouches[0].clientX;
+        if (ex - sx > 50) { if(idx > 0) { idx--; img.src = pages[idx]; } }
+        else if (sx - ex > 50) { if(idx < pages.length-1) { idx++; img.src = pages[idx]; } }
+      }, {passive:true});
     }
-};
 
-// Swipe controls
-let startX = 0;
-document.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-document.addEventListener("touchend", e => {
-    let endX = e.changedTouches[0].clientX;
-    if (endX - startX > 50) document.getElementById("prev").click();
-    if (startX - endX > 50) document.getElementById("next").click();
-});
-
-// Load first page
-showPage(0);
-
-// Register service worker
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/Fractured-Realm-Rulebook/sw.js");
-}
-</script>
-
+    // Start init (wait a tick to let the library script register)
+    if (window.PageFlip) initFlip();
+    else {
+      // library not ready yet: try after a short delay
+      let tries = 0;
+      const t = setInterval(()=> {
+        if (window.PageFlip) { clearInterval(t); initFlip(); }
+        if (++tries > 40) { clearInterval(t); fallback.style.display='block'; fallback.textContent='Failed to load flip library.'; simpleFallbackViewer(); }
+      }, 100);
+    }
+  })();
+  </script>
 </body>
 </html>
