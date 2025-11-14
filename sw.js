@@ -1,40 +1,56 @@
-// Service Worker for Fractured Realm Rulebook PWA
+const CACHE_NAME = "fractured-realm-cache-v10";
 
-const CACHE_NAME = 'fractured-realm-cache-v1';
+const base = "/Fractured-Realm-Rulebook/";
+
 const urlsToCache = [
-  'index.html',
-  'manifest.json',
-  'sw.js',
-  'fracturedrealmlogo.png',
-  '01.png','02.png','03.png','04.png','05.png','06.png','07.png',
-  '08.png','09.png','10.png','11.png','12.png','13.png','14.png',
-  '15.png','16.png','17.png'
+  base,
+  base + "index.html",
+  base + "manifest.json",
+  base + "sw.js",
+  base + "fracturedrealmlogo.png",
+  base + "01.png",
+  base + "02.png",
+  base + "03.png",
+  base + "04.png",
+  base + "05.png",
+  base + "06.png",
+  base + "07.png",
+  base + "08.png",
+  base + "09.png",
+  base + "10.png",
+  base + "11.png",
+  base + "12.png",
+  base + "13.png",
+  base + "14.png",
+  base + "15.png",
+  base + "16.png",
+  base + "17.png"
 ];
 
-// Install event: cache essential files
-self.addEventListener('install', event => {
+self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
+  self.skipWaiting();
 });
 
-// Activate event: clean up old caches if necessary
-self.addEventListener('activate', event => {
+self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(key => {
-        if(key !== CACHE_NAME) return caches.delete(key);
-      }))
-    ).then(() => self.clients.claim())
+      Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) return caches.delete(key);
+        })
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request).then(resp => resp || fetch(event.request))
   );
 });
 
-// Fetch event: serve cached files if offline
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
-  );
-});
 
