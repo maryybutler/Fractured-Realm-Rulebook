@@ -1,4 +1,4 @@
-const CACHE_NAME = "fractured-realm-cache-v14";
+const CACHE_NAME = "fractured-realm-cache-v15";
 
 const base = "/Fractured-Realm-Rulebook/";
 
