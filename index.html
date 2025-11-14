@@ -1,302 +1,200 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fractured Realm Rulebook</title>
-
-<!-- PWA & mobile -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#5e5754">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Fractured Realm Rulebook">
-<link rel="apple-touch-icon" href="fracturedrealmlogo.png">
-
 <style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html,body { height:100%; margin:0; font-family:Verdana,Arial,sans-serif; background:#5e5754; color:#111; }
-
-  .app {
-    height:100vh; width:100vw;
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:flex-start;
+  html, body {
+    margin:0;
+    padding:0;
+    height:100%;
+    width:100%;
+    background-color:#5e5754;
+    display:flex;
+    justify-content:center;
+    align-items:center;
     overflow:hidden;
   }
 
-  .topbar {
-    width:100%; max-width:1200px; display:flex; align-items:center; gap:12px;
-    padding:10px 16px; box-sizing:border-box;
-    color: #f3f2f1;
-  }
-  .logo { width:48px; height:48px; border-radius:8px; object-fit:contain; }
-  .title { font-weight:700; font-size:1.05rem; color:#f3f2f1; }
-
   .stage {
-    width: min(1100px, 96vw);
-    height: min(750px, 78vh);
-    margin: 6px auto;
-    perspective: 1600px;
-    position: relative;
+    width:90%;
+    height:90%;
+    perspective:1600px;
     display:flex;
     align-items:center;
     justify-content:center;
   }
 
-  .book { width:100%; height:100%; position:relative; }
+  .book {
+    width:100%;
+    height:100%;
+    position:relative;
+  }
 
   .page {
     position:absolute;
-    top:0; left:0; right:0; bottom:0;
-    width:100%; height:100%;
-    background: #fdfcfb;
-    border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#5e5754;
+    border-radius:10px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.25);
     overflow:hidden;
-    padding:0;
-    -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-    transform-origin: left center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
+    transform-origin:left center;
     transition: transform 700ms cubic-bezier(.2,.9,.25,1), box-shadow 300ms;
-    display:flex; align-items:center; justify-content:center;
   }
 
   .page img {
-    max-width:100%;
-    max-height:100%;
-    width:auto;
-    height:auto;
+    max-width:95%;
+    max-height:95%;
     object-fit:contain;
     display:block;
-    margin:auto;
   }
 
   .page.visible { transform: none; }
-  .page.flip-forward {
-    transform-origin: left center;
-    transform: rotateY(-180deg);
-    box-shadow: 0 18px 36px rgba(0,0,0,0.35);
-  }
-  .page.incoming {
-    transform-origin: left center;
-    transform: rotateY(180deg);
-  }
+  .page.flip-forward { transform: rotateY(-180deg); box-shadow:0 18px 36px rgba(0,0,0,0.35); }
+  .page.incoming { transform: rotateY(180deg); }
   .page.incoming.show { transform: rotateY(0deg); }
-
-  .page-index {
-    position: absolute;
-    right: 12px;
-    bottom: 8px;
-    font-size: 0.85rem;
-    color: #666;
-    background: rgba(255,255,255,0.85);
-    padding:4px 8px;
-    border-radius:6px;
-    font-weight:700;
-  }
-
-  .controls {
-    width:100%; max-width:1200px; display:flex; gap:10px; align-items:center; justify-content:space-between;
-    padding:8px 16px; box-sizing:border-box;
-    color: #f3f2f1;
-  }
-
-  .control-left, .control-right { display:flex; gap:10px; align-items:center; }
-
-  .btn {
-    background:#2b7992; color:white; padding:10px 14px; border-radius:10px; border:0; font-weight:700; cursor:pointer;
-    box-shadow:0 6px 12px rgba(43,121,146,0.18);
-  }
-  .btn.small { background:transparent; color:#f3f2f1; border:2px solid #f3f2f1; padding:8px 10px; }
-  .btn:active { transform: translateY(1px); }
-
-  .page-indicator { font-weight:700; color:#f3f2f1; }
 
   @supports not (transform-style: preserve-3d) {
     .page.flip-forward { transform: translateX(-100%); transition: transform 320ms ease; }
     .page.incoming { transform: translateX(100%); }
     .page.incoming.show { transform: translateX(0); }
   }
-
-  @media (max-width:640px) {
-    .stage { height: 72vh; }
-    .page-index { right:8px; bottom:6px; font-size:0.75rem; padding:3px 6px; }
-  }
 </style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <img src="fracturedrealmlogo.png" alt="logo" class="logo">
-      <div class="title">Fractured Realm Rulebook</div>
-    </div>
-
-    <div class="stage" id="stage">
-      <div class="book" id="book">
-        <!-- pages populated by JavaScript -->
-      </div>
-    </div>
-
-    <div class="controls">
-      <div class="control-left">
-        <button class="btn small" id="firstBtn">⟸ First</button>
-        <button class="btn small" id="prevBtn">⟵ Prev</button>
-      </div>
-
-      <div class="page-indicator" id="pageIndicator">0 / 0</div>
-
-      <div class="control-right">
-        <button class="btn small" id="nextBtn">Next ⟶</button>
-        <button class="btn small" id="lastBtn">Last ⟹</button>
-      </div>
+  <div class="stage" id="stage">
+    <div class="book" id="book">
+      <!-- pages populated by JS -->
     </div>
   </div>
 
 <script>
-/* USER CONFIG: exact base filenames (without extension).
-   You provided CARD GAME - Rule Set-01.png ... CARD GAME - Rule Set-18.png */
-const pageBases = Array.from({length:18}, (_,i) => `CARD GAME - Rule Set-${String(i+1).padStart(2,'0')}`);
+const pages = [
+  "CARD_GAME–Rule_Set-01.png",
+  "CARD_GAME–Rule_Set-02.png",
+  "CARD_GAME–Rule_Set-03.png",
+  "CARD_GAME–Rule_Set-04.png",
+  "CARD_GAME–Rule_Set-05.png",
+  "CARD_GAME–Rule_Set-06.png",
+  "CARD_GAME–Rule_Set-07.png",
+  "CARD_GAME–Rule_Set-08.png",
+  "CARD_GAME–Rule_Set-09.png",
+  "CARD_GAME–Rule_Set-10.png",
+  "CARD_GAME–Rule_Set-11.png",
+  "CARD_GAME–Rule_Set-12.png",
+  "CARD_GAME–Rule_Set-13.png",
+  "CARD_GAME–Rule_Set-14.png",
+  "CARD_GAME–Rule_Set-15.png",
+  "CARD_GAME–Rule_Set-16.png",
+  "CARD_GAME–Rule_Set-17.png",
+  "CARD_GAME–Rule_Set-18.png"
+];
 
-const book = document.getElementById('book');
-const pageIndicator = document.getElementById('pageIndicator');
-let pages = [];
 let currentIndex = 0;
+const bookEl = document.getElementById('book');
+let pageEls = [];
 
-function createPageElement(baseName, index) {
+// create page elements
+function createPage(baseName, index){
   const page = document.createElement('div');
   page.className = 'page incoming';
   page.dataset.index = index;
 
   const img = document.createElement('img');
-  // use PNG (your files are PNG)
-  img.src = `${encodeURIComponent(baseName)}.png`;
-
-  img.onerror = function() {
-    // show placeholder if image failed to load
-    img.remove();
-    const placeholder = document.createElement('div');
-    placeholder.style.padding = '24px';
-    placeholder.style.textAlign = 'center';
-    placeholder.innerHTML = `<div style="font-weight:700; color:#a33; margin-bottom:8px;">Image not found</div>
-      <div style="color:#ddd">Expected: "${baseName}.png"</div>`;
-    page.appendChild(placeholder);
-  };
-
+  img.src = encodeURIComponent(baseName);
+  img.onerror = ()=>{ img.remove(); };
   page.appendChild(img);
-
-  const idx = document.createElement('div');
-  idx.className = 'page-index';
-  idx.textContent = `Page ${index+1}`;
-  page.appendChild(idx);
 
   return page;
 }
 
-function buildPages() {
-  book.innerHTML = '';
-  pageBases.forEach((b, i) => {
-    const p = createPageElement(b, i);
-    book.appendChild(p);
+// build all pages
+function buildPages(){
+  bookEl.innerHTML = '';
+  pages.forEach((p,i)=>{
+    const el = createPage(p,i);
+    bookEl.appendChild(el);
   });
-  pages = Array.from(book.querySelectorAll('.page'));
-  refreshPages();
+  pageEls = Array.from(bookEl.querySelectorAll('.page'));
+  pageEls[currentIndex].classList.add('visible');
 }
 
-function refreshPages() {
-  pages = Array.from(book.querySelectorAll('.page'));
-  pages.forEach((p,i) => {
-    p.dataset.index = i;
-    p.style.zIndex = (i + 1).toString();
-    p.classList.remove('visible','flip-forward','incoming','show');
-  });
-  if (pages[currentIndex]) pages[currentIndex].classList.add('visible');
-  updateIndicator();
-}
-
-function updateIndicator() {
-  pageIndicator.textContent = (currentIndex+1) + ' / ' + pages.length;
-}
-
-function flipForward() {
-  if (currentIndex >= pages.length-1) return;
-  const curr = pages[currentIndex];
-  const next = pages[currentIndex+1];
-  next.style.zIndex = (parseInt(curr.style.zIndex) + 1);
+function nextPage(){
+  if(currentIndex >= pageEls.length-1) return;
+  const curr = pageEls[currentIndex];
+  const next = pageEls[currentIndex+1];
   next.classList.add('incoming');
-  void next.offsetWidth;
+  void next.offsetWidth; // force reflow
   curr.classList.add('flip-forward');
   next.classList.add('show');
-
-  setTimeout(()=> {
+  setTimeout(()=>{
     curr.classList.remove('visible','flip-forward');
     next.classList.remove('incoming','show');
     currentIndex++;
-    pages.forEach((p,i)=> p.style.zIndex = (i+1));
-    pages[currentIndex].classList.add('visible');
-    updateIndicator();
+    pageEls[currentIndex].classList.add('visible');
   }, 720);
 }
 
-function flipBackward() {
-  if (currentIndex <= 0) return;
-  const curr = pages[currentIndex];
-  const prev = pages[currentIndex-1];
-  prev.style.zIndex = (parseInt(curr.style.zIndex) + 1);
+function prevPage(){
+  if(currentIndex <= 0) return;
+  const curr = pageEls[currentIndex];
+  const prev = pageEls[currentIndex-1];
   prev.classList.add('incoming');
-  prev.style.transformOrigin = 'left center';
   prev.style.transform = 'rotateY(-180deg)';
   void prev.offsetWidth;
   prev.classList.add('show');
-  curr.classList.add('flip-back');
-
+  curr.classList.add('flip-forward'); // temporarily reverse animation
   setTimeout(()=>{
     prev.classList.remove('incoming','show');
-    prev.style.transform = '';
-    prev.style.zIndex = (parseInt(prev.dataset.index)+1);
-    curr.classList.remove('visible','flip-back');
+    prev.style.transform='';
+    curr.classList.remove('visible','flip-forward');
     currentIndex--;
-    pages.forEach((p,i)=> p.style.zIndex = (i+1));
-    pages[currentIndex].classList.add('visible');
-    updateIndicator();
-  }, 720);
+    pageEls[currentIndex].classList.add('visible');
+  },720);
 }
 
-/* Controls */
-document.getElementById('nextBtn').addEventListener('click', flipForward);
-document.getElementById('prevBtn').addEventListener('click', flipBackward);
-document.getElementById('firstBtn').addEventListener('click', ()=> { while (currentIndex > 0) flipBackward(); });
-document.getElementById('lastBtn').addEventListener('click', ()=> { while (currentIndex < pages.length-1) flipForward(); });
+// swipe handling
+let startX=0,startY=0,startTime=0;
+const threshold=40,allowedTime=500;
+document.getElementById('stage').addEventListener('touchstart',e=>{
+  const t = e.changedTouches[0];
+  startX = t.pageX; startY = t.pageY; startTime = Date.now();
+},{passive:true});
 
-/* Keyboard */
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') flipForward();
-  if (e.key === 'ArrowLeft') flipBackward();
+document.getElementById('stage').addEventListener('touchend',e=>{
+  const t = e.changedTouches[0];
+  const dx = t.pageX-startX, dy = t.pageY-startY, dt = Date.now()-startTime;
+  if(dt<=allowedTime && Math.abs(dx)>=threshold && Math.abs(dy)<=120){
+    if(dx<0) nextPage();
+    else prevPage();
+  }
+},{passive:true});
+
+// optional keyboard navigation
+window.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight') nextPage();
+  if(e.key==='ArrowLeft') prevPage();
 });
 
-/* Touch swipe */
-let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-const threshold = 40;
-const allowedTime = 500;
-document.getElementById('stage').addEventListener('touchstart', function(e){
-  const t = e.changedTouches[0];
-  touchStartX = t.pageX; touchStartY = t.pageY; touchStartTime = Date.now();
-}, {passive:true});
-document.getElementById('stage').addEventListener('touchend', function(e){
-  const t = e.changedTouches[0];
-  const dx = t.pageX - touchStartX;
-  const dy = t.pageY - touchStartY;
-  const dt = Date.now() - touchStartTime;
-  if (dt <= allowedTime && Math.abs(dx) >= threshold && Math.abs(dy) <= 120) {
-    if (dx < 0) flipForward(); else flipBackward();
-  }
-}, {passive:true});
-
-/* Build and register SW */
 buildPages();
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch((err)=>console.warn('SW failed:',err));
+
+// register service worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW failed:',err));
 }
 </script>
 </body>
 </html>
+
 
