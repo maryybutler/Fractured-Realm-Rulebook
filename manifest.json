@@ -3,7 +3,7 @@
   "short_name": "FR Rulebook",
   "start_url": "index.html",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "background_color": "#5e5754",
   "theme_color": "#5e5754",
   "icons": [
@@ -19,5 +19,4 @@
     }
   ]
 }
-
 
