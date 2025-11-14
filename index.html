@@ -63,23 +63,23 @@
 
   <script>
     const pages = [
-      "CARD_GAME–Rule_Set-01 - Copy.png",
-      "CARD_GAME–Rule_Set-03 - Copy.png",
-      "CARD_GAME–Rule_Set-04 - Copy.png",
-      "CARD_GAME–Rule_Set-05 - Copy.png",
-      "CARD_GAME–Rule_Set-06 - Copy.png",
-      "CARD_GAME–Rule_Set-07 - Copy.png",
-      "CARD_GAME–Rule_Set-08 - Copy.png",
-      "CARD_GAME–Rule_Set-09 - Copy.png",
-      "CARD_GAME–Rule_Set-10 - Copy.png",
-      "CARD_GAME–Rule_Set-11 - Copy.png",
-      "CARD_GAME–Rule_Set-12 - Copy.png",
-      "CARD_GAME–Rule_Set-13 - Copy.png",
-      "CARD_GAME–Rule_Set-14 - Copy.png",
-      "CARD_GAME–Rule_Set-15 - Copy.png",
-      "CARD_GAME–Rule_Set-16 - Copy.png",
-      "CARD_GAME–Rule_Set-17 - Copy.png",
-      "CARD_GAME–Rule_Set-18 - Copy.png",
+      "01.png",
+      "02.png",
+      "03.png",
+      "04.png",
+      "05.png",
+      "06.png",
+      "07.png",
+      "08.png",
+      "09.png",
+      "10.png",
+      "11.png",
+      "12.png",
+      "13.png",
+      "14.png",
+      "15.png",
+      "16.png",
+      "17.png",
       "fracturedrealmlogo.png"
     ];
 
@@ -106,6 +106,7 @@
       if(currentPage < pages.length - 1) showPage(currentPage + 1);
     });
 
+    // Swipe support
     let startX = 0;
     imgElement.addEventListener("touchstart", e => startX = e.touches[0].clientX);
     imgElement.addEventListener("touchend", e => {
@@ -114,8 +115,10 @@
       else if(startX - endX > 50 && currentPage < pages.length - 1) showPage(currentPage + 1);
     });
 
+    // Start with page 01
     showPage(0);
   </script>
 </body>
 </html>
+
 
